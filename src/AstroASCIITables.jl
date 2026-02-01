@@ -146,10 +146,21 @@ function _parse_header(lines, tablename=nothing)
 end
 
 
-# ── Build FixedWidthTables colspecs from ColSpec list ────────────────────────
+# ── Build FixedWidthTables colspecs / global missings list ───────────────────
 
 _fwt_specs(cols) = NamedTuple{Tuple(c.name for c in cols)}(
-    Tuple((c.range, !isnothing(c.nullval) ? String : c.base_type) for c in cols))
+    Tuple((c.range, c.base_type) for c in cols))
+
+# XXX: missings are applied globally across all columns, so a sentinel value
+# that is nullable in one column (e.g. "-9.9") will also be treated as missing
+# in any other column that happens to contain the same string.  Proper
+# per-column support would require extending FixedWidthTables.
+_global_missings(cols) = unique(mapreduce(vcat, cols; init=Any[]) do col
+    col.nullval === nothing ? [] :
+    col.nullval == ""       ? [""] :
+    col.nullval == "-"      ? [r"^-+$"] :
+                              [col.nullval]
+end)
 
 
 # ── Stream header lines from a self-contained file, leave IO at data start ───
@@ -193,21 +204,6 @@ function _collect_header_streaming!(io::IO)
 end
 
 
-# ── Post-process a nullable column (read as String, convert to target type) ──
-
-function _postprocess_col(vals, spec::ColSpec)
-    T  = spec.base_type
-    nv = spec.nullval
-    is_null(s) = nv == ""  ? isempty(s) :
-                 nv == "-" ? (!isempty(s) && all(==('-'), s)) :
-                             s == nv
-    map(vals) do v
-        ismissing(v) && return missing
-        s = strip(v)
-        is_null(s) ? missing : T == String ? string(s) : parse(T, s)
-    end
-end
-
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -227,23 +223,19 @@ function read_cds(path; readme=nothing)
         end
         open(string(path), "r") do io
             (FWT.read(io, StructArray, _fwt_specs(cols);
-                      missings=[""], allow_shorter_lines=true), cols)
+                      missings=_global_missings(cols), allow_shorter_lines=true), cols)
         end
     else
         # Self-contained: stream header, then hand the same IO to FWT for data.
         open(string(path), "r") do io
             cols = _collect_header_streaming!(io)   # advances io past header
             (FWT.read(io, StructArray, _fwt_specs(cols);
-                      missings=[""], allow_shorter_lines=true), cols)
+                      missings=_global_missings(cols), allow_shorter_lines=true), cols)
         end
     end
 
     fwt_names = Tuple(c.name for c in cols)
-    result_cols = map(cols) do col
-        vals = getproperty(raw, col.name)
-        !isnothing(col.nullval) ? _postprocess_col(vals, col) : vals
-    end
-    StructArray(NamedTuple{fwt_names}(Tuple(result_cols)))
+    StructArray(NamedTuple{fwt_names}(Tuple(getproperty(raw, n) for n in fwt_names)))
 end
 
 end
