@@ -1,5 +1,7 @@
 module AstroASCIITables
 
+export cds_to_unitful
+
 using StructArrays
 import FixedWidthTables as FWT
 
@@ -210,5 +212,8 @@ function read_cds(path; readme=nothing)
 
     raw
 end
+
+
+include("units.jl")
 
 end
