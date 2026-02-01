@@ -163,44 +163,18 @@ _global_missings(cols) = unique(mapreduce(vcat, cols; init=Any[]) do col
 end)
 
 
-# ── Stream header lines from a self-contained file, leave IO at data start ───
-# Reads lines one at a time, stops (and seeks back) when the first data row is
-# reached.  Data starts after the 3rd section delimiter inside the BBB block.
+# ── Stream header from a self-contained file, leave IO at data start ─────────
+# Read first MAX_READ_BYTES (enough for any CDS header), find the last section
+# delimiter, seek to right after it, parse the header.
+
+const MAX_READ_BYTES = 100_000
 
 function _collect_header_streaming!(io::IO)
-    header = String[]
-    in_bbb = false
-    bbb_delims = 0
-    in_notes = false
-    last_delim_end_pos = nothing   # byte position right after the last post-coldef delimiter
-    while !eof(io)
-        pos = position(io)
-        line = readline(io)
-        if !in_bbb || bbb_delims < 3
-            # Preamble or inside the Byte-by-byte Description block
-            push!(header, line)
-            if occursin(r"Byte-by-byte Description"i, line)
-                in_bbb, bbb_delims = true, 0
-            elseif in_bbb && _is_section_delimiter(line)
-                bbb_delims += 1
-            end
-        else
-            # Post-coldef: anything here is Notes or data
-            if _is_section_delimiter(line)
-                push!(header, line)
-                in_notes = false
-                last_delim_end_pos = position(io)   # start of next line
-            elseif in_notes || startswith(line, "Note") || isempty(strip(line))
-                push!(header, line)
-                startswith(line, "Note") && (in_notes = true)
-            else
-                # First non-Note/non-blank line after the column block → data
-                seek(io, something(last_delim_end_pos, pos))
-                break
-            end
-        end
-    end
-    return _parse_header(header, nothing)
+    parts = split(String(read(io, MAX_READ_BYTES)), '\n')
+    last_delim_idx = findlast(ss -> _is_section_delimiter(rstrip(ss, '\r')), parts)
+    isnothing(last_delim_idx) && error("No section delimiter found in CDS self-contained file")
+    seek(io, last(parentindices(parts[last_delim_idx])[1]) + 1)
+    return _parse_header(rstrip.(parts[1:last_delim_idx], '\r'), nothing)
 end
 
 

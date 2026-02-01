@@ -87,6 +87,22 @@ end
     @test t1.EW[1] ≈ 58.0             # ?=-9.9 sentinel; this row is non-missing
 end
 
+@testitem "cds no data" begin
+    using AstroASCIITables
+    t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/no_data_cds.dat"))
+    @test length(t) == 0
+    @test length(propertynames(t)) == 12   # same columns as cds.dat
+end
+
+@testitem "cds functional" begin
+    # cdsFunctional.dat: F18.16/F20.17/E24.18 wide floats, VizieR pipe-separator format
+    using AstroASCIITables
+    t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/cdsFunctional.dat"))
+    @test length(t) == 1
+    @test t.logTe[1] ≈ 3.85
+    @test t.Mass[1] ≈ 0.24458909
+end
+
 @testitem "_" begin
     import Aqua
     Aqua.test_all(AstroASCIITables; ambiguities=false)
