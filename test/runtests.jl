@@ -5,7 +5,7 @@ using TestItemRunner
 # Self-contained file: header and data in one file, separated by --- / === delimiters.
 # Source: astropy io/ascii/tests/data/cds.dat (ported from test_cds_header_from_readme.py)
 @testitem "cds self-contained" begin
-    using AstroASCIITables
+
     t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/cds.dat"))
     @test length(t) == 1
     @test t.Index[1] == 1
@@ -18,7 +18,7 @@ end
 
 # Separate ReadMe + data file; ReadMe has multi-line descriptions and nullable columns.
 @testitem "cds description" begin
-    using AstroASCIITables
+
     readme = joinpath(@__DIR__, "data/cds/description/ReadMe")
     data   = joinpath(@__DIR__, "data/cds/description/table.dat")
     t = AstroASCIITables.read_cds(data; readme)
@@ -27,7 +27,7 @@ end
 
 # ReadMe with two stacked "Byte-by-byte Description" lines sharing one column block.
 @testitem "cds multi header" begin
-    using AstroASCIITables
+
     readme = joinpath(@__DIR__, "data/cds/multi/ReadMe")
 
     t1 = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/cds/multi/lhs2065.dat"); readme)
@@ -43,7 +43,7 @@ end
 
 # ReadMe where the filename entry uses a "*" glob pattern.
 @testitem "cds glob header" begin
-    using AstroASCIITables
+
     readme = joinpath(@__DIR__, "data/cds/glob/ReadMe")
     t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/cds/glob/lmxbrefs.dat"); readme)
     @test length(t) == 291
@@ -53,7 +53,7 @@ end
 
 # Real VizieR download: 15-row table with 18 columns; check specific Bmag values.
 @testitem "vizier table1" begin
-    using AstroASCIITables
+
     readme = joinpath(@__DIR__, "data/vizier/ReadMe")
     t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/vizier/table1.dat"); readme)
     @test length(t) == 15
@@ -67,7 +67,7 @@ end
 # Source: astropy io/ascii/tests/data/cds/null/ (ported from test_cds_ignore_nullable,
 # test_cds_no_whitespace, test_cds_order)
 @testitem "cds null" begin
-    using AstroASCIITables
+
 
     # ReadMe: tests [min/max]?, ]min/max[?, and ?=value sentinels
     readme = joinpath(@__DIR__, "data/cds/null/ReadMe")
@@ -88,7 +88,7 @@ end
 end
 
 @testitem "cds no data" begin
-    using AstroASCIITables
+
     t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/no_data_cds.dat"))
     @test length(t) == 0
     @test length(propertynames(t)) == 12   # same columns as cds.dat
@@ -96,7 +96,7 @@ end
 
 @testitem "cds functional" begin
     # cdsFunctional.dat: F18.16/F20.17/E24.18 wide floats, VizieR pipe-separator format
-    using AstroASCIITables
+
     t = AstroASCIITables.read_cds(joinpath(@__DIR__, "data/cdsFunctional.dat"))
     @test length(t) == 1
     @test t.logTe[1] ≈ 3.85
