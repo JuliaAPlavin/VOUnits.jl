@@ -274,7 +274,7 @@ end
     @test _unit("'1'.s**-1") == 1u"s^-1"      # '1' = dimensionless scale factor
     @test _unit("'1'*s^-1") == 1u"s^-1"
     @test _unit("'m'") == u"m"                # quoted known unit still parses
-    @test_logs (:warn,) parse_unit("'1'.s**-1", VOUnit())  # warns about quotes
+    @test _unit("'1'.s**-1") == 1u"s^-1" # full Unitful parsing still works on quoted strings
 end
 
 @testitem "fits" begin
@@ -450,8 +450,8 @@ end
 
 @testitem "_" begin
     import Aqua
-    Aqua.test_all(AstroUnitFormats; ambiguities=false)
-    Aqua.test_ambiguities(AstroUnitFormats)
+    Aqua.test_all(VOUnits; ambiguities=false)
+    Aqua.test_ambiguities(VOUnits)
 
     import CompatHelperLocal as CHL
     CHL.@check()

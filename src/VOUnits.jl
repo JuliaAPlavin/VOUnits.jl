@@ -1,4 +1,4 @@
-module AstroUnitFormats
+module VOUnits
 
 export parse_unit, unit_string, CDS, VOUnit, FITS
 

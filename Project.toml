@@ -1,4 +1,4 @@
-name = "AstroUnitFormats"
+name = "VOUnits"
 uuid = "a1e4a1a0-2026-0228-0017-f00a75000000"
 authors = ["Alexander Plavin <alexander@plav.in>"]
 version = "0.1.0"

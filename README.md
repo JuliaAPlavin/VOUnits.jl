@@ -1,4 +1,4 @@
-# AstroUnitFormats.jl
+# VOUnits.jl
 
 Parse astronomical unit strings into [Unitful.jl](https://github.com/PainterQubits/Unitful.jl) units. Supports the unit formats commonly found in astronomical catalogs and data files:
 
@@ -11,7 +11,7 @@ Parse astronomical unit strings into [Unitful.jl](https://github.com/PainterQubi
 By default, `parse_unit` accepts accepts all format variants and is liberal about which syntax you throw at it:
 
 ```julia
-julia> using AstroUnitFormats
+julia> using VOUnits
 
 julia> parse_unit("km/s")
 (unit = km s⁻¹, valuefn = identity)
