@@ -1,3 +1,7 @@
+module AstroUnitFormats
+
+export parse_unit, unit_string, CDS, VOUnit, FITS
+
 using Unitful: Unitful, NoUnits, uparse
 using UnitfulAstro: UnitfulAstro
 using UnitfulAngles: UnitfulAngles
@@ -234,4 +238,6 @@ function unit_string(unit::Unitful.Units)
         p = Int(Unitful.power(comp))
         p == 1 ? s : s * "**" * string(p)
     end, ".")
+end
+
 end
