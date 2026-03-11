@@ -102,6 +102,12 @@ const _DIMLESS_RE = Regex("(?<![a-zA-Z])(" * _dimless_alt * ")([+-]?\\d+(?!\\.))
 function _parse_unit(s::AbstractString, name_re, name_dict)
     s = strip(s)
 
+    # VOUnit quoted unit strings: strip single quotes (e.g. '1' → 1, 'dex' → dex)
+    if occursin('\'', s)
+        @warn "Stripping single quotes from unit string (VOUnit quoted-unit notation)" unit_string=s
+        s = replace(s, "'" => "")
+    end
+
     # Log notation: [unit] (CDS brackets) or log(unit) → exp10 transform
     m = match(r"^(?:\[(.+)\]|log\((.+)\))$", s)
     if m !== nothing
@@ -238,6 +244,11 @@ function unit_string(unit::Unitful.Units)
         p = Int(Unitful.power(comp))
         p == 1 ? s : s * "**" * string(p)
     end, ".")
+end
+
+function unit_string(unit::Unitful.MixedUnits)
+    unit.units == NoUnits || error("unit_string does not support compound MixedUnits like $unit")
+    string(unit)
 end
 
 end

@@ -269,6 +269,12 @@ end
     # ── Lenient: CDS-style strings also parse ───────────────────────────
     @test _unit("km.s-1") == u"km/s"          # bare-sign power works too
     @test _unit("km/s") == u"km/s"
+
+    # ── Quoted unit strings (VOUnit single-quote notation) ────────────
+    @test _unit("'1'.s**-1") == 1u"s^-1"      # '1' = dimensionless scale factor
+    @test _unit("'1'*s^-1") == 1u"s^-1"
+    @test _unit("'m'") == u"m"                # quoted known unit still parses
+    @test_logs (:warn,) parse_unit("'1'.s**-1", VOUnit())  # warns about quotes
 end
 
 @testitem "fits" begin
@@ -386,6 +392,11 @@ end
 
     # ── Dimensionless ──────────────────────────────────────────────────────
     @test _str(Unitful.NoUnits) == "---"
+
+    # ── MixedUnits (log units) ───────────────────────────────────────────
+    @test _str(u"mag") == "mag"
+    @test _str(u"dB") == "dB"
+    @test_throws Exception _str(u"mag/yr")
 
     # ── Roundtrip: unit_string → parse_unit → same unit ────────────────────
     for uu in [u"km/s", u"Msun", u"Å", u"°", u"arcminute", u"arcsecond",
