@@ -1,9 +1,9 @@
 # VOUnits.jl
 
-Parse astronomical unit strings into [Unitful.jl](https://github.com/PainterQubits/Unitful.jl) units. Supports the unit formats commonly found in astronomical catalogs and data files:
+Parse astronomical unit strings — as defined by the [IVOA VOUnit standard](https://www.ivoa.net/documents/VOUnits/) and related formats — into [Unitful.jl](https://github.com/PainterQubits/Unitful.jl) units. Supported formats:
 
-- **CDS** — used by VizieR and CDS catalogs (e.g. `km.s-1`, `[K]`, `10+3J/m/s/kpc2`)
 - **VOUnit** — IVOA standard (e.g. `m**-2`, `erg.s**-1.cm**-2`)
+- **CDS** — used by VizieR and CDS catalogs (e.g. `km.s-1`, `[K]`, `10+3J/m/s/kpc2`)
 - **FITS** — FITS file headers (similar to VOUnit)
 
 ## Usage
@@ -36,7 +36,7 @@ julia> parse_unit("log(Hz)")
 (unit = Hz, valuefn = exp10)
 ```
 
-Convert back from Unitful units to a CDS-format string:
+Convert back from Unitful units to a VOUnit-format string:
 
 ```julia
 julia> unit_string(u"km/s")
@@ -46,4 +46,4 @@ julia> unit_string(u"Msun")
 "solMass"
 ```
 
-If you need strict format-specific parsing, pass a format specifier: `parse_unit(s, CDS())`, `parse_unit(s, VOUnit())`, or `parse_unit(s, FITS())`.
+If you need format-specific parsing, pass a format specifier: `parse_unit(s, CDS())`, `parse_unit(s, VOUnit())`, or `parse_unit(s, FITS())`. There are barely any differences now, but more specific checks can be added in the future.
