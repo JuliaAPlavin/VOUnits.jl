@@ -104,7 +104,7 @@ function _parse_unit(s::AbstractString, name_re, name_dict)
 
     # VOUnit quoted unit strings: strip single quotes (e.g. '1' → 1, 'dex' → dex)
     if occursin('\'', s)
-        @warn "Stripping single quotes from unit string (VOUnit quoted-unit notation)" unit_string=s
+        @debug "Stripping single quotes from unit string (VOUnit quoted-unit notation)" unit_string=s
         s = replace(s, "'" => "")
     end
 
