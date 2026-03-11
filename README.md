@@ -6,6 +6,8 @@ Parse astronomical unit strings — as defined by the [IVOA VOUnit standard](htt
 - **CDS** — used by VizieR and CDS catalogs (e.g. `km.s-1`, `[K]`, `10+3J/m/s/kpc2`)
 - **FITS** — FITS file headers (similar to VOUnit)
 
+This package is currently used in [VOTables.jl](https://github.com/JuliaAPlavin/VOTables.jl) and [AstroTables.jl](https://github.com/JuliaAPlavin/AstroTables.jl) for units handling.
+
 ## Usage
 
 By default, `parse_unit` accepts accepts all format variants and is liberal about which syntax you throw at it:
